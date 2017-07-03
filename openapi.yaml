@@ -1,0 +1,103 @@
+swagger: "2.0"
+info:
+  description: Labic API to access data
+  title: Hash Data Driven API
+  version: "0.0.1"
+host: localhost:5000
+basePath: /
+consumes:
+- application/json
+produces:
+- application/json
+schemes:
+- http
+paths:
+  /articles:
+    get:
+      description: Get Articles
+      operationId: findArticles
+      parameters:
+      - name: filters[dateCreated]
+        in: query
+        description: Filter by a time interval using the standard [ISO 860 - Time Intervals](https://en.wikipedia.org/wiki/ISO_8601#Time_intervals)
+        required: false
+        type: string
+        format: date-time/date-time
+      - name: filters[datePublished]
+        in: query
+        description: Filter by a time interval using the standard [ISO 860 - Time Intervals](https://en.wikipedia.org/wiki/ISO_8601#Time_intervals)
+        required: false
+        type: string
+      - name: filters[keywords]
+        in: query
+        description: Filter by a list of keyworkds
+        required: false
+        type: array
+        collectionFormat: csv
+        items:
+          type: string
+      - name: fields
+        in: query
+        description: Return only the fields listed
+        required: false
+        type: array
+        collectionFormat: csv
+        items:
+          type: string
+      - name: page
+        in: query
+        description: Pagination control
+        required: false
+        type: integer
+        format: int32
+      - name: per_page
+        in: query
+        description: Articles per page
+        required: false
+        type: integer
+        format: int32
+      responses:
+          200:
+            description: "successful operation"
+            schema:
+              type: "array"
+              items:
+                $ref: "#/definitions/Article"
+definitions:
+  Article:
+    properties:
+      id:
+        type: string
+      type:
+        type: string
+      name:
+        type: string
+      keywords:
+        type: array
+        format: string
+      articleBody:
+        type: string
+      dateCreated:
+        type: string 
+        format: date-time
+      dateModified:
+        type: string 
+        format: date-time
+      datePublished:
+        type: string 
+        format: date-time
+  Author:
+    properties:
+      type:
+        type: string
+      name:
+        type: string
+  Error:
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string

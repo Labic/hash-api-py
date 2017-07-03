@@ -1,0 +1,1 @@
+web: gunicorn -b :$PORT --chdir ./hash_data_api api:server

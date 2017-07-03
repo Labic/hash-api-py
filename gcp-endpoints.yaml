@@ -1,0 +1,3 @@
+endpoints_api_service:
+  name: "inep-hash-data-api.appspot.com"
+  config_id: "2017-05-20-r1"
