@@ -44,6 +44,7 @@ class Articles(object):
           'datePublished': x['datePublished'].isoformat() if 'datePublished' in x else None,
           'dateCreated': x['dateCreated'].isoformat() if 'dateCreated' in x else None,
           'image': x.get('image')[0],
+          'articleBody': x.get('articleBody'),
           'description': x.get('description'),
           'keywords': x.get('keywords'),
         } for x in query]
