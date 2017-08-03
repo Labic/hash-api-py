@@ -30,7 +30,7 @@ class Articles(object):
         # [append2filters(('keywords', '=', k)) for k in keywords]
         # TODO: implement a better way to find that is an array in query
         [append2filters(('keywords[]', '=', k)) for k in keywords]
-      
+      print(fields)
       query = self.datasource.query(
         kind=self.name, 
         filters=filters, 
@@ -54,8 +54,7 @@ class Articles(object):
           } for x in query]
       else:
         req.context['data'] = []
-        # TODO: implement fetch im mongo dat source
-        # } for x in query.fetch(limit=100)]
+      
     except Exception as e:
       logger.error(e)
       # TODO Add a better descriptions of the error
