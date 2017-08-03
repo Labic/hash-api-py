@@ -50,7 +50,6 @@ class MongoDatasource(object):
     for o in kargs.get('order', ()):
       direction = DESCENDING if o[:1] == '-' else ASCENDING
       property  = o.replace('-', '')
-      
       append2sort((property, direction))
 
     if kargs.get('fields'):
@@ -61,13 +60,12 @@ class MongoDatasource(object):
     else:
       kargs['fields'] = None 
 
-    print(kargs['fields'])
     return collection.find(
       filter=filter, 
-      projection=kargs['fields'],
+      # projection=kargs['fields'],
       sort=sort, 
       skip=kargs['skip'],
       limit=kargs['limit'],)
 
-  def fetch(self, **kargs):
+  def fetch(self, id):
     pass

@@ -30,7 +30,7 @@ class Articles(object):
         # [append2filters(('keywords', '=', k)) for k in keywords]
         # TODO: implement a better way to find that is an array in query
         [append2filters(('keywords[]', '=', k)) for k in keywords]
-      print(fields)
+      
       query = self.datasource.query(
         kind=self.name, 
         filters=filters, 
@@ -40,20 +40,17 @@ class Articles(object):
         # distinct_on = ['url'],
         order=['-dateCreated'])
 
-      if query:
-        req.context['data'] = [{
-            'id': str(x.get('_id')),
-            'headline': x.get('name'),
-            'url': x.get('url'),
-            'datePublished': x['datePublished'].isoformat() if 'datePublished' in x else None,
-            'dateCreated': x['dateCreated'].isoformat() if 'dateCreated' in x else None,
-            'image': x.get('image')[0],
-            'articleBody': x.get('articleBody'),
-            'description': x.get('description'),
-            'keywords': x.get('keywords'),
-          } for x in query]
-      else:
-        req.context['data'] = []
+      req.context['data'] = [{
+          'id': str(x.get('_id')),
+          'headline': x.get('name'),
+          'url': x.get('url'),
+          'datePublished': x['datePublished'].isoformat() if 'datePublished' in x else None,
+          'dateCreated': x['dateCreated'].isoformat() if 'dateCreated' in x else None,
+          'image': x.get('image')[0],
+          'articleBody': x.get('articleBody'),
+          'description': x.get('description'),
+          'keywords': x.get('keywords'),
+        } for x in query]
       
     except Exception as e:
       logger.error(e)
