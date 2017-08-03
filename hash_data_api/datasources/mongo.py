@@ -30,9 +30,9 @@ class MongoDatasource(object):
       if operator == '=' and '[]' in property:
         property = property.replace('[]', '')
         if not filter.get(property):
-          filter[property] = {'$in': []}
+          filter[property] = {'$all': []}
         # TODO: find a better way to deal with arrays
-        filter[property]['$in'].append(value)
+        filter[property]['$all'].append(value)
       
       if operator == '>' and isinstance(value, datetime):
         filter[property] = {
