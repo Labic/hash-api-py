@@ -57,6 +57,7 @@ class MongoDatasource(object):
       fields = { '_id': True }
       for f in kargs['fields']:
         fields[f] = True
+      kargs['fields'] = fields
     else:
       kargs['fields'] = None 
 
