@@ -34,10 +34,9 @@ class Articles(object):
       query = self.datasource.query(
         kind=self.name, 
         filters=filters, 
-        fields=fields,
-        skip=0 if page == 1 else page * per_page,
+        fields=fields, 
+        skip=0 if page == 1 else page * per_page, 
         limit=per_page, 
-        # distinct_on = ['url'],
         order=['-dateCreated'])
 
       req.context['data'] = [{

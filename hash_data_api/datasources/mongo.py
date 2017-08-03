@@ -20,9 +20,8 @@ class MongoDatasource(object):
 
     filter = {}
     for f in kargs.get('filters', ()):
-      property = f[0]
-      operator = f[1]
-      value    = f[2]
+      print(f)
+      property, operator, value = f
       
       # TODO: find a better way to discover tha is array
       if operator == '=' and not '[]' in property:
