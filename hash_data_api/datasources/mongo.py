@@ -50,11 +50,9 @@ class MongoDatasource(object):
       property  = o.replace('-', '')
       append2sort((property, direction))
 
-    if kargs.get('fields'):
-      kargs['fields'].append('_id')
-    else:
+    if !kargs.get('fields'):
       kargs['fields'] = None 
-    print(kargs['fields'])
+    
     return collection.find(
       filter=filter, 
       projection=kargs['fields'],
