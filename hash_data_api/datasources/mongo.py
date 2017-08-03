@@ -20,7 +20,6 @@ class MongoDatasource(object):
 
     filter = {}
     for f in kargs.get('filters', ()):
-      print(f)
       property, operator, value = f
       
       # TODO: find a better way to discover tha is array
@@ -61,7 +60,7 @@ class MongoDatasource(object):
 
     return collection.find(
       filter=filter, 
-      # projection=kargs['fields'],
+      projection=kargs['fields'],
       sort=sort, 
       skip=kargs['skip'],
       limit=kargs['limit'],)
