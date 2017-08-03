@@ -65,7 +65,7 @@ class MongoDatasource(object):
       projection=kargs['fields'],
       sort=sort, 
       skip=kargs['skip'],
-      limit=kargs['limit'],).to_dict()
+      limit=kargs['limit'],)
 
   def fetch(self, **kargs):
     pass

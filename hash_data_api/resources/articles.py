@@ -40,8 +40,8 @@ class Articles(object):
         # distinct_on = ['url'],
         order=['-dateCreated'])
 
-      req.context['data'] = [ {
-          'id': x.get('_id'),
+      req.context['data'] = [{
+          'id': str(x.get('_id')),
           'headline': x.get('name'),
           'url': x.get('url'),
           'datePublished': x['datePublished'].isoformat() if 'datePublished' in x else None,
