@@ -34,7 +34,7 @@ class Articles(object):
       query = self.datasource.query(
         kind=self.name, 
         filters=filters, 
-        projection=fields,
+        fields=fields,
         skip=0 if page == 1 else page * per_page,
         limit=per_page, 
         # distinct_on = ['url'],

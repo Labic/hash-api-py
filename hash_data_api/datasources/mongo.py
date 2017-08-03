@@ -19,7 +19,7 @@ class MongoDatasource(object):
     collection = self.db[kargs['kind']]
 
     filter = {}
-    for f in kargs['filters']:
+    for f in kargs.get('filters', ()):
       property = f[0]
       operator = f[1]
       value    = f[2]
@@ -47,13 +47,13 @@ class MongoDatasource(object):
           filter[property] = {'$lte': value}
 
     sort = []; append2sort = sort.append
-    for o in kargs['order']:
+    for o in kargs.get('order', ()):
       direction = DESCENDING if o[:1] == '-' else ASCENDING
       property  = o.replace('-', '')
       
       append2sort((property, direction))
 
-    if kargs['fields']:
+    if kargs.get('fields'):
       fields = { '_id': True }
       for f in kargs['fields']:
         fields[f] = True
