@@ -1,6 +1,5 @@
 import logging
 import falcon
-import ujson
 import json
 
 class JSONLD(object):
@@ -28,7 +27,7 @@ class JSONLD(object):
                                     'A valid JSON document is required.')
 
       try:
-        req.context['doc'] = ujson.loads(body.decode('utf-8'))
+        req.context['doc'] = json.loads(body.decode('utf-8'))
       except (ValueError, UnicodeDecodeError):
         raise falcon.HTTPError(falcon.HTTP_753,
                                'Malformed JSON',
@@ -40,13 +39,13 @@ class JSONLD(object):
     if 'data' not in req.context:
       return
     
-    resp.body = ujson.dumps({'data': req.context['data']}, ensure_ascii=False)
+    resp.body = json.dumps({'data': req.context['data']}, ensure_ascii=False)
 
   @staticmethod
   def error_serializer(req, resp, exception):
     # if req.client_accepts_json:
     logging.exception('message')
     resp.content_type = 'application/json'
-    resp.body = ujson.dumps({
+    resp.body = json.dumps({
         'error': exception.to_dict(),
       }, ensure_ascii=False)
