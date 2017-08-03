@@ -53,8 +53,19 @@ class MongoDatasource(object):
       
       append2sort((property, direction))
 
-    print(filter)
-    return collection.find(filter=filter, sort=sort)
+    if kargs['fields']:
+      fields = { '_id': True }
+      for f in kargs['fields']:
+        fields[f] = True
+    else:
+      kargs['fields'] = None 
+
+    return collection.find(
+      filter=filter, 
+      projection=kargs['fields'],
+      sort=sort, 
+      skip=kargs['skip'],
+      limit=kargs['limit'],)
 
   def fetch(self, **kargs):
     pass

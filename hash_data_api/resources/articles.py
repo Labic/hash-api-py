@@ -34,11 +34,14 @@ class Articles(object):
       query = self.datasource.query(
         kind=self.name, 
         filters=filters, 
-        projection=fields, 
+        projection=fields,
+        skip=0 if page == 1 else page * per_page,
+        limit=per_page, 
         # distinct_on = ['url'],
         order=['-dateCreated'])
 
       req.context['data'] = [ {
+          'id': x.get('_id'),
           'headline': x.get('name'),
           'url': x.get('url'),
           'datePublished': x['datePublished'].isoformat() if 'datePublished' in x else None,
