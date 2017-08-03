@@ -40,17 +40,20 @@ class Articles(object):
         # distinct_on = ['url'],
         order=['-dateCreated'])
 
-      req.context['data'] = [{
-          'id': str(x.get('_id')),
-          'headline': x.get('name'),
-          'url': x.get('url'),
-          'datePublished': x['datePublished'].isoformat() if 'datePublished' in x else None,
-          'dateCreated': x['dateCreated'].isoformat() if 'dateCreated' in x else None,
-          'image': x.get('image')[0],
-          'articleBody': x.get('articleBody'),
-          'description': x.get('description'),
-          'keywords': x.get('keywords'),
-        } for x in query]
+      if query:
+        req.context['data'] = [{
+            'id': str(x.get('_id')),
+            'headline': x.get('name'),
+            'url': x.get('url'),
+            'datePublished': x['datePublished'].isoformat() if 'datePublished' in x else None,
+            'dateCreated': x['dateCreated'].isoformat() if 'dateCreated' in x else None,
+            'image': x.get('image')[0],
+            'articleBody': x.get('articleBody'),
+            'description': x.get('description'),
+            'keywords': x.get('keywords'),
+          } for x in query]
+      else:
+        req.context['data'] = []
         # TODO: implement fetch im mongo dat source
         # } for x in query.fetch(limit=100)]
     except Exception as e:
