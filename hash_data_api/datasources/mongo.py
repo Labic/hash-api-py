@@ -54,7 +54,7 @@ class MongoDatasource(object):
       kargs['fields'].append('_id')
     else:
       kargs['fields'] = None 
-
+    print(kargs['fields'])
     return collection.find(
       filter=filter, 
       projection=kargs['fields'],
