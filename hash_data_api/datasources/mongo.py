@@ -50,7 +50,7 @@ class MongoDatasource(object):
       property  = o.replace('-', '')
       append2sort((property, direction))
 
-    if !kargs.get('fields'):
+    if not kargs.get('fields'):
       kargs['fields'] = None 
     
     return collection.find(
