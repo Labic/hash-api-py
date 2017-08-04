@@ -1,3 +1,5 @@
+from os import environ
+
 import falcon
 from falcon_cors import CORS
 
@@ -5,7 +7,11 @@ from middlewares.http import Request
 from middlewares.media_types import JSONLD
 from middlewares.cache import CacheMiddleware
 from datasources import DatasourceEngine
-from resources import Articles
+from resources import Article
+
+from mongoengine import connect as mongo_connect
+
+mongo_connect(environ['MONGO_URI'])
 
 # falcon.API instances are callable WSGI apps
 
@@ -26,7 +32,7 @@ server.set_error_serializer(JSONLD.error_serializer)
 datasource = DatasourceEngine('MONGO')
 # files = StorageEngine('google-cloud-storage', credentias='AWS_S3_CREDENTIALS')
 
-server.add_route('/articles', Articles(datasource=datasource))
+server.add_route('/articles', Article(datasource=datasource))
 
 if __name__ == "__main__":
   """

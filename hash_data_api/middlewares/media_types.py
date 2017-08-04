@@ -1,7 +1,7 @@
 import logging
 import falcon
-import ujson
 import json
+import ujson
 
 class JSONLD(object):
 
@@ -40,7 +40,10 @@ class JSONLD(object):
     if 'data' not in req.context:
       return
     
-    resp.body = ujson.dumps({'data': req.context['data']}, ensure_ascii=False)
+    if 'json' in req.context:
+      resp.body = req.context['data']
+    else: 
+      resp.body = ujson.dumps({'data': req.context['data']}, ensure_ascii=False)
 
   @staticmethod
   def error_serializer(req, resp, exception):

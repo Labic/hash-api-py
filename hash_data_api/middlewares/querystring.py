@@ -1,0 +1,3 @@
+
+class QueryStringParse(object):
+  pass
