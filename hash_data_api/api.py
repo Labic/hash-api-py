@@ -9,11 +9,6 @@ from middlewares.cache import CacheMiddleware
 from datasources import DatasourceEngine
 from resources import Article
 
-from mongoengine import connect as mongo_connect
-
-mongo_connect(environ['MONGO_URI'])
-
-# falcon.API instances are callable WSGI apps
 
 cors = CORS(
   allow_all_origins=True,
