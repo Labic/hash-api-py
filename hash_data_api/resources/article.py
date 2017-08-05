@@ -78,9 +78,9 @@ class Article(object):
           for f in fields:
             if f == 'datePublished' and 'datePublished' in x:
               o[f] = x[f].isoformat()
-            elif f == 'dateCreated' and 'dateCreated' in x::
+            elif f == 'dateCreated' and 'dateCreated' in x:
               o[f] = x[f].isoformat()
-            elif f == 'dateModified' and 'dateModified' in x::
+            elif f == 'dateModified' and 'dateModified' in x:
               o[f] = x[f].isoformat()
             else:
               if f in x:
