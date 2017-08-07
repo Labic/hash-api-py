@@ -88,7 +88,7 @@ class Article(object):
 
           append2data(o)
 
-          req.context['data'] = data
+        req.context['data'] = data
       
     except Exception as e:
       logger.error(e)
