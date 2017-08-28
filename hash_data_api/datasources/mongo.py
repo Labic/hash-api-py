@@ -16,9 +16,6 @@ class MongoDatasource(object):
     self.client.close()
 
   def query(self, **kargs):
-    collection = self.db[kargs['kind']]
-    print(collection)
-
     filter = {}
     for f in kargs.get('filters', ()):
       property, operator, value = f
@@ -54,12 +51,11 @@ class MongoDatasource(object):
     if not kargs.get('fields'):
       kargs['fields'] = None 
     
-    return collection.find(
-      filter=filter, 
-      projection=kargs['fields'],
-      skip=kargs['skip'],
-      limit=kargs['limit'],
-      sort=sort,)
+    return self.db[kargs['kind']].find(filter=filter, 
+                                       projection=kargs['fields'],
+                                       skip=kargs['skip'],
+                                       limit=kargs['limit'],
+                                       sort=sort,)
 
-  def fetch(self, id):
+  def lookup(self, **kargs):
     pass
