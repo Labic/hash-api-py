@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-
 import logging; logger = logging.getLogger(__name__)
-import asyncio
 
 import falcon
+
 
 class Article(object):
 

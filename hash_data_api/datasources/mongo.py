@@ -17,6 +17,7 @@ class MongoDatasource(object):
 
   def query(self, **kargs):
     collection = self.db[kargs['kind']]
+    print(collection)
 
     filter = {}
     for f in kargs.get('filters', ()):
