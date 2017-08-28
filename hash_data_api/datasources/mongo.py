@@ -1,5 +1,5 @@
 from os import environ
-import signal
+from signal import signal, SIGTERM
 from datetime import datetime
 
 from pymongo import MongoClient
@@ -10,7 +10,7 @@ class MongoDatasource(object):
   def __init__(self):
     self.client = MongoClient(environ['MONGO_URI'])
     self.db = self.client.get_default_database()
-    signal.signal(signal.SIGTERM, self._signal_term_handler)
+    signal(SIGTERM, self._signal_term_handler)
 
   def _signal_term_handler(self, signal, frame):
     self.client.close()
