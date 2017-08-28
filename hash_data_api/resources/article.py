@@ -61,15 +61,15 @@ class Article(object):
       if not fields:
         req.context['data'] = [{
             'id': str(x.get('_id')),
-            'headline': x.get('name'),
-            'url': x.get('url'),
+            'headline': x.get('name', None),
+            'url': x.get('url', None),
             'datePublished': x['datePublished'].isoformat() if 'datePublished' in x else None,
             'dateCreated': x['dateCreated'].isoformat() if 'dateCreated' in x else None,
-            'image': x.get('image')[0],
-            'articleBody': x.get('articleBody'),
-            'description': x.get('description'),
-            'keywords': x.get('keywords'),
-          } for x in query if x is not None]
+            'image': x.get('image', [None])[0],
+            'articleBody': x.get('articleBody', None),
+            'description': x.get('description', None),
+            'keywords': x.get('keywords', None),
+          } for x in query]
       else:
         data = []; append2data = data.append
         for x in query:
