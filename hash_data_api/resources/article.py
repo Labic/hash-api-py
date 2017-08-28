@@ -57,6 +57,7 @@ class Article(object):
         limit=per_page, 
         order=['-dateCreated'])
 
+      print('query', query)
       if query is not None:
         if not fields:
           req.context['data'] = [{
