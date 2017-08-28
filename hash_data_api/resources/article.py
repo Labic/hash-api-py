@@ -58,37 +58,40 @@ class Article(object):
         limit=per_page, 
         order=['-dateCreated'])
 
-      if not fields:
-        req.context['data'] = [{
-            'id': str(x.get('_id')),
-            'headline': x.get('name'),
-            'url': x.get('url'),
-            'datePublished': x['datePublished'].isoformat() if 'datePublished' in x else None,
-            'dateCreated': x['dateCreated'].isoformat() if 'dateCreated' in x else None,
-            'image': x.get('image')[0],
-            'articleBody': x.get('articleBody'),
-            'description': x.get('description'),
-            'keywords': x.get('keywords'),
-          } for x in query]
+      if query:
+        if not fields:
+          req.context['data'] = [{
+              'id': str(x.get('_id')),
+              'headline': x.get('name'),
+              'url': x.get('url'),
+              'datePublished': x['datePublished'].isoformat() if 'datePublished' in x else None,
+              'dateCreated': x['dateCreated'].isoformat() if 'dateCreated' in x else None,
+              'image': x.get('image')[0],
+              'articleBody': x.get('articleBody'),
+              'description': x.get('description'),
+              'keywords': x.get('keywords'),
+            } for x in query]
+        else:
+          data = []; append2data = data.append
+          for x in query:
+            o = {'id': str(x['_id'])}
+            
+            for f in fields:
+              if f == 'datePublished' and 'datePublished' in x:
+                o[f] = x[f].isoformat()
+              elif f == 'dateCreated' and 'dateCreated' in x:
+                o[f] = x[f].isoformat()
+              elif f == 'dateModified' and 'dateModified' in x:
+                o[f] = x[f].isoformat()
+              else:
+                if f in x:
+                  o[f] = x[f]
+
+            append2data(o)
+
+          req.context['data'] = data
       else:
-        data = []; append2data = data.append
-        for x in query:
-          o = {'id': str(x['_id'])}
-          
-          for f in fields:
-            if f == 'datePublished' and 'datePublished' in x:
-              o[f] = x[f].isoformat()
-            elif f == 'dateCreated' and 'dateCreated' in x:
-              o[f] = x[f].isoformat()
-            elif f == 'dateModified' and 'dateModified' in x:
-              o[f] = x[f].isoformat()
-            else:
-              if f in x:
-                o[f] = x[f]
-
-          append2data(o)
-
-        req.context['data'] = data
+        req.context['data'] = []
       
     except Exception as e:
       logger.error(e)
