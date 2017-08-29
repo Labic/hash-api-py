@@ -36,7 +36,7 @@ class Article(object):
       fields        = req.get_param_as_list('fields') or ()
       page          = req.get_param_as_int('page') or 1
       per_page      = req.get_param_as_int('per_page') or 10
-
+      
       if dateCreated is not None:
         append2filters(('dateCreated', '>', dateCreated.start))
         append2filters(('dateCreated', '<', dateCreated.end))
@@ -56,8 +56,7 @@ class Article(object):
         skip=0 if page == 1 else page * per_page, 
         limit=per_page, 
         order=['-dateCreated'])
-
-      print('query', query)
+      
       if not fields:
         req.context['data'] = [{
             'id': str(x.get('_id')),
@@ -67,6 +66,7 @@ class Article(object):
             'dateCreated': x['dateCreated'].isoformat() if 'dateCreated' in x else None,
             'image': x.get('image', [None])[0],
             'articleBody': x.get('articleBody', None),
+            'audio': x.get('audio', None),
             'description': x.get('description', None),
             'keywords': x.get('keywords', None),
           } for x in query]
@@ -85,11 +85,11 @@ class Article(object):
             else:
               if f in x:
                 o[f] = x[f]
-
+          
           append2data(o)
-
+        
         req.context['data'] = data
-      
+    
     except Exception as e:
       logger.error(e)
       # TODO Add a better descriptions of the error
