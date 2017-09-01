@@ -3,28 +3,15 @@ import logging; logger = logging.getLogger(__name__)
 
 import falcon
 
+__all__ = ['Article', 'Item']
 
-class Article(object):
 
-  name='Article'
+class Collection(object):
+
+  name = 'Article'
 
   def __init__(self, datasource):
     self.datasource = datasource
-
-  async def query(req):
-    raise NotImplementedError
-
-  async def lookup(req):
-    raise NotImplementedError
-
-  async def delete(req):
-    raise NotImplementedError
-  
-  async def insert(req):
-    raise NotImplementedError
-
-  async def update(req):
-    raise NotImplementedError
 
   def on_get(self, req, resp):
     try:
@@ -36,7 +23,7 @@ class Article(object):
       fields        = req.get_param_as_list('fields') or ()
       page          = req.get_param_as_int('page') or 1
       per_page      = req.get_param_as_int('per_page') or 10
-      
+
       if dateCreated is not None:
         append2filters(('dateCreated', '>', dateCreated.start))
         append2filters(('dateCreated', '<', dateCreated.end))
@@ -56,7 +43,7 @@ class Article(object):
         skip=0 if page == 1 else page * per_page, 
         limit=per_page, 
         order=['-dateCreated'])
-      
+
       if not fields:
         req.context['data'] = [{
             'id': str(x.get('_id')),
@@ -64,6 +51,7 @@ class Article(object):
             'url': x.get('url', None),
             'datePublished': x['datePublished'].isoformat() if 'datePublished' in x else None,
             'dateCreated': x['dateCreated'].isoformat() if 'dateCreated' in x else None,
+            'dateModified': x['dateModified'].isoformat() if 'dateModified' in x else None,
             'image': x.get('image', [None])[0],
             'articleBody': x.get('articleBody', None),
             'audio': x.get('audio', None),
@@ -85,12 +73,49 @@ class Article(object):
             else:
               if f in x:
                 o[f] = x[f]
-          
+
           append2data(o)
-        
+
         req.context['data'] = data
     
     except Exception as e:
       logger.error(e)
       # TODO Add a better descriptions of the error
       raise falcon.HTTPInternalServerError()
+
+
+class Item:
+
+  name = 'Article'
+
+  def __init__(self, datasource):
+    self.datasource = datasource
+
+  def on_get(self, req, resp, id):
+    # try:
+    fields = req.get_param_as_list('fields') or ()
+    
+    item = self.datasource.lookup(kind=self.name, 
+                                  id=id,
+                                  fields=fields,)
+
+    item['id'] = str(item.get('_id'))[0],
+    del item['_id']
+    if 'dateCreated' in item:
+      item['dateCreated'] = item['dateCreated'].isoformat()
+    if 'datePublished' in item:
+      item['datePublished'] = item['datePublished'].isoformat()
+    if 'dateModified' in item:
+      item['dateModified'] = item['dateModified'].isoformat()
+    if 'image' in item:
+      item['image'] = item['image'][0]
+    if 'name' in item:
+      item['headline'] = item['name']
+      del item['headline']
+
+    print(item)
+    req.context['data'] = item
+    
+    # except Exception as e:
+    #   logger.error(e)
+    #   raise falcon.HTTPInternalServerError()

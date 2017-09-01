@@ -16,3 +16,6 @@ class DatasourceEngine(object):
 
   def fetch(self, **kargs):
     return self.datasource.fetch(**kargs)
+
+  def lookup(self, **kargs):
+    return self.datasource.lookup(**kargs)

@@ -4,6 +4,7 @@ from datetime import datetime
 
 from pymongo import MongoClient
 from pymongo import ASCENDING, DESCENDING
+from bson.objectid import ObjectId
 
 class MongoDatasource(object):
 
@@ -58,4 +59,6 @@ class MongoDatasource(object):
                                        sort=sort,)
 
   def lookup(self, **kargs):
-    pass
+    return self.db[kargs['kind']].find_one(filter={'_id': ObjectId(kargs['id'])},
+                                           projection=None,)
+                                           # projection=kargs['fields'],)

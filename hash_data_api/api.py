@@ -7,8 +7,7 @@ from middlewares.http import Request
 from middlewares.media_types import JSONLD
 from middlewares.cache import CacheMiddleware
 from datasources import DatasourceEngine
-from resources import Article
-
+from resources import article, hook, oauth
 
 cors = CORS(
   allow_all_origins=True,
@@ -27,9 +26,14 @@ server.set_error_serializer(JSONLD.error_serializer)
 datasource = DatasourceEngine('MONGO')
 # files = StorageEngine('google-cloud-storage', credentias='AWS_S3_CREDENTIALS')
 
-server.add_route('/articles', Article(datasource=datasource))
+oAuthEvernote = oauth.OAuthEvernote()
+server.add_route('/articles', article.Collection(datasource=datasource))
+server.add_route('/articles/{id}', article.Item(datasource=datasource))
+server.add_route('/hooks/evernote', hook.HookEvernote())
+# server.add_route('/oauths/evernote', oauth.Evernote)
+# server.add_route('/oauths/evernote/callback', oAuthEvernote)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
   """
   This is used when running locally. Gunicorn is used to run the
   application on Cloud.
