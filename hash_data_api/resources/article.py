@@ -1,121 +1,146 @@
 # -*- coding: utf-8 -*-
+import abc
 import logging; logger = logging.getLogger(__name__)
+import datetime as dt
+import typing
 
-import falcon
+import marshmallow
+from mongoengine import *
+from mongoengine.queryset import queryset_manager, DoesNotExist
+from apistar import http, Route, typesystem
 
-__all__ = ['Article', 'Item']
+__all__ = ['ArticleResource']
+
+class ArticleModel(Document):
+  # __slots__ = ('id', 'articleBody', 'author', 'dateCreated', 
+  #              'dateModified', 'datePublished', 'description', 
+  #              'description', 'image', 'keywords', 'name', 'url', 'meta',)
+  
+  articleBody   = StringField()
+  author        = ListField(DictField())
+  audio         = DictField()
+  dateCreated   = DateTimeField(default=dt.datetime.utcnow)
+  dateModified  = DateTimeField()
+  datePublished = DateTimeField()
+  description   = StringField()
+  image         = ListField(StringField())
+  images_to_download_urls = ListField(StringField())
+  keywords      = ListField(StringField())
+  name          = StringField()
+  url           = URLField()
+
+  meta = {
+    'collection': 'Article',
+  }
+
+  @queryset_manager
+  def objects(doc_cls, queryset):
+      # This may actually also be done by defining a default ordering for
+      # the document, but this illustrates the use of manager methods
+      return queryset.order_by('-dateCreated')
+
+class AudioSchema(marshmallow.Schema):
+  url = marshmallow.fields.Url()
+  dateCreated = marshmallow.fields.DateTime('iso8601')
+
+class ArticleSchema(marshmallow.Schema):
+  id            = marshmallow.fields.String()
+  articleBody   = marshmallow.fields.String()
+  author        = marshmallow.fields.List(marshmallow.fields.Dict)
+  audio         = AudioSchema()
+  dateCreated   = marshmallow.fields.DateTime('iso8601')
+  dateModified  = marshmallow.fields.DateTime('iso8601')
+  datePublished = marshmallow.fields.DateTime('iso8601')
+  description   = marshmallow.fields.String()
+  name          = marshmallow.fields.String(dump_to='headline')
+  image         = marshmallow.fields.List(marshmallow.fields.String)
+  images_to_download_urls = marshmallow.fields.List(marshmallow.fields.String)
+  keywords      = marshmallow.fields.List(marshmallow.fields.String)
+  url           = marshmallow.fields.Url()
+  
+  # @marshmallow.post_load
+  # def create(self, data):
+  #   return ArticleModel(**data)
+
+# class AuthorSchema(typesystem.Object):
+#   properties={
+#     'type': typesystem.string(default=None),
+#     'name': typesystem.string(default=None),
+#   }
+
+# class ArticleSchema(typesystem.Object):
+#     properties = {
+#         # 'id': typesystem.Object(),
+#         # 'articleBody': typesystem.string(default=None),
+#         'author': typesystem.array(items=AuthorSchema),
+#         'dateCreated': typesystem.string(format='datetime', default=None),
+#         'dateModified': typesystem.string(format='datetime', default=None),
+#         'datePublished': typesystem.string(format='datetime', default=None),
+#         'description': typesystem.string(default=None),
+#         'name': typesystem.string(default=None),
+#         # 'headline': typesystem.string(),
+#         'image': typesystem.array(items=typesystem.string(), default=None),
+#         'keywords': typesystem.array(items=typesystem.string(), default=None),
+#         'url': typesystem.string(),
+#     }
 
 
-class Collection(object):
+class ArticleResource(object):
 
-  name = 'Article'
+  # async def browse(fields: str, page: int = 1, per_page: int = 25,):
+  def browse(fields: str, page: int = 1, per_page: int = 25,):
+    page = page or 1
+    per_page = per_page or 25
+    skip = 0 if page == 1 else page * per_page
+    if fields:
+      result = ArticleModel.objects()\
+                           .only(fields)\
+                           .skip(skip)\
+                           .limit(per_page)
+    else:
+      result = ArticleModel.objects()\
+                           .exclude(('articleBody'))\
+                           .skip(skip)\
+                           .limit(per_page)
 
-  def __init__(self, datasource):
-    self.datasource = datasource
+    data, errors = ArticleSchema(many=True).dump(result)
+    return data
+    # return [ArticleSchema(record.to_mongo().to_dict()) for record in result]
 
-  def on_get(self, req, resp):
+  # async def read(id: str):
+  def read(id: str):
+    result = ArticleModel.objects.get(id=id)
+    data, errors = ArticleSchema().dump(result)
+    return data
+
+  # async def add(article: ArticleSchema):
+  #   ArticleSchema.save()
+  #   return ArticleSchema().dump(article)
+
+  # async def edit(id: str, article: http.RequestData):
+  def edit(id: str, article: http.RequestData):
     try:
-      filters = []; append2filters = filters.append
-      
-      dateCreated   = req.get_param_as_time_interval('filters[dateCreated]')
-      datePublished = req.get_param_as_time_interval('filters[datePublished]')
-      keywords      = req.get_param_as_list('filters[keywords]') or ()
-      fields        = req.get_param_as_list('fields') or ()
-      page          = req.get_param_as_int('page') or 1
-      per_page      = req.get_param_as_int('per_page') or 10
-
-      if dateCreated is not None:
-        append2filters(('dateCreated', '>', dateCreated.start))
-        append2filters(('dateCreated', '<', dateCreated.end))
-      if datePublished is not None:
-        append2filters(('datePublished', '>', datePublished.start))
-        append2filters(('datePublished', '<', datePublished.end))
-      if keywords:
-        # FIXME use map or list compresion
-        # [append2filters(('keywords', '=', k)) for k in keywords]
-        # TODO: implement a better way to find that is an array in query
-        [append2filters(('keywords[]', '=', k)) for k in keywords]
-      
-      query = self.datasource.query(
-        kind=self.name, 
-        filters=filters, 
-        fields=fields, 
-        skip=0 if page == 1 else page * per_page, 
-        limit=per_page, 
-        order=['-dateCreated'])
-
-      if not fields:
-        req.context['data'] = [{
-            'id': str(x.get('_id')),
-            'headline': x.get('name', None),
-            'url': x.get('url', None),
-            'datePublished': x['datePublished'].isoformat() if 'datePublished' in x else None,
-            'dateCreated': x['dateCreated'].isoformat() if 'dateCreated' in x else None,
-            'dateModified': x['dateModified'].isoformat() if 'dateModified' in x else None,
-            'image': x.get('image', [None])[0],
-            'articleBody': x.get('articleBody', None),
-            'audio': x.get('audio', None),
-            'description': x.get('description', None),
-            'keywords': x.get('keywords', None),
-          } for x in query]
-      else:
-        data = []; append2data = data.append
-        for x in query:
-          o = {'id': str(x['_id'])}
-          
-          for f in fields:
-            if f == 'datePublished' and 'datePublished' in x:
-              o[f] = x[f].isoformat()
-            elif f == 'dateCreated' and 'dateCreated' in x:
-              o[f] = x[f].isoformat()
-            elif f == 'dateModified' and 'dateModified' in x:
-              o[f] = x[f].isoformat()
-            else:
-              if f in x:
-                o[f] = x[f]
-
-          append2data(o)
-
-        req.context['data'] = data
+      ArticleModel.objects.get(id=id)\
+                          .update(**article)
+    except DoesNotExist:
+      return http.Response(status=404, headers={'Content-Type': 'application/json'})
     
-    except Exception as e:
-      logger.error(e)
-      # TODO Add a better descriptions of the error
-      raise falcon.HTTPInternalServerError()
+    return http.Response(status=204, headers={u'Content-Type': 'application/json'})
 
-
-class Item:
-
-  name = 'Article'
-
-  def __init__(self, datasource):
-    self.datasource = datasource
-
-  def on_get(self, req, resp, id):
-    # try:
-    fields = req.get_param_as_list('fields') or ()
+  # async def delete(id: str) -> dict:
+  def delete(id: str) -> dict:
+    try:
+      result = ArticleModel.objects.get(id=id)
+      result.delete()
+    except DoesNotExist:
+      return http.Response(status=404)
     
-    item = self.datasource.lookup(kind=self.name, 
-                                  id=id,
-                                  fields=fields,)
+    return http.Response(None, status=204)
 
-    item['id'] = str(item.get('_id'))[0],
-    del item['_id']
-    if 'dateCreated' in item:
-      item['dateCreated'] = item['dateCreated'].isoformat()
-    if 'datePublished' in item:
-      item['datePublished'] = item['datePublished'].isoformat()
-    if 'dateModified' in item:
-      item['dateModified'] = item['dateModified'].isoformat()
-    if 'image' in item:
-      item['image'] = item['image'][0]
-    if 'name' in item:
-      item['headline'] = item['name']
-      del item['headline']
-
-    print(item)
-    req.context['data'] = item
-    
-    # except Exception as e:
-    #   logger.error(e)
-    #   raise falcon.HTTPInternalServerError()
+  routes = [
+    Route('articles', 'GET', browse),
+    Route('articles/{id}', 'GET', read),
+    # Route('articles', 'POST', add),
+    Route('articles/{id}', 'PATCH', edit),
+    Route('articles/{id}', 'DELETE', delete),
+  ]

@@ -1,10 +1,8 @@
-falcon==1.2.0
-falcon-cors==1.1.2
+apistar==0.2.12
+evernote3==1.25.12  
 google-cloud-datastore==1.0.0
-evernote3==1.25.12
-gunicorn==19.7.1
-python-memcached==1.58
-pymongo==3.4.0
-six==1.10.0
-ujson==1.35
 iso8601utils==0.1.2
+marshmallow==2.13.6
+mongoengine==v0.13.0
+uvicorn==0.0.15
+uvitools==0.0.4
