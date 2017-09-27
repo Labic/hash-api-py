@@ -31,6 +31,8 @@ class BadRequest(BaseError):
 class NotFound(BaseError):
   status_code = 404
 
+class MethodNotAllowed(BaseError):
+  status_code = 405
 
 class InternalServerError(BaseError):
   status_code = 500

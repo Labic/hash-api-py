@@ -36,11 +36,11 @@ class Article(mongo.Document):
     'strict': False,
   }
 
-  @mongo.queryset_manager
-  def objects(doc_cls, queryset):
-    return queryset.filter(Q(metadata__removed=False) 
-                           | Q(metadata__removed__exists=False))\
-                   .order_by('-dateCreated', 'datePublished', 'headline')
+  # @mongo.queryset_manager
+  # def objects(doc_cls, queryset):
+  #   return queryset.filter(Q(metadata__removed=False) 
+  #                          | Q(metadata__removed__exists=False))\
+  #                  .order_by('-dateCreated', 'datePublished', 'headline')
                    
 
   class Schema(marshal.Schema):

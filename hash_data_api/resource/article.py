@@ -13,6 +13,23 @@ class ArticleResource(object):
   @blueprint_v1.route('', methods=['GET'])
   @query_string
   def browse(filters={}, fields=[], sort=['-dateCreated'], page={}):
+    """
+    TODO: resolve this
+    if u'filter[dateCreated]' in request.full_path:
+      interval = parsers.interval(request.args.get('filter[dateCreated]', 'P1W'))
+      filter['dateCreated__gte'] = interval.start
+      filter['dateCreated__lte'] = interval.end
+    if u'filter[dateModified]' in request.full_path:
+      interval = parsers.interval(request.args.get('filter[dateModified]', 'P1W'))
+      filter['dateModified__gte'] = interval.start
+      filter['dateModified__lte'] = interval.end
+    if u'filter[datePublished]' in request.full_path:
+      interval = parsers.interval(request.args.get('filter[datePublished]', 'P1W'))
+      filter['datePublished__gte'] = interval.start
+      filter['datePublished__lte'] = interval.end
+    if u'filter[keywords]' in request.full_path:
+      filter['keywords__in'] = request.args.get('filter[keywords]').split(',')
+    """
     result = Article.objects(**filters)\
                     .only(*fields)\
                     .exclude(*['articleBody'])\
