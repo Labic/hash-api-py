@@ -55,6 +55,7 @@ class MongoDatasource(object):
     if not kargs.get('fields'):
       kargs['fields'] = None 
     
+    print(filter)
     return self.db[kargs['kind']].find(filter=filter, 
                                        projection=kargs['fields'],
                                        skip=kargs['skip'],
@@ -64,4 +65,7 @@ class MongoDatasource(object):
   def lookup(self, **kargs):
     return self.db[kargs['kind']].find_one(filter={'_id': ObjectId(kargs['id'])},
                                            projection=None,)
-                                           # projection=kargs['fields'],)
+
+  def patch(self, **kargs):
+    return self.db[kargs['kind']].update_many(filter={'_id': ObjectId(kargs['id'])},
+                                              update=kargs['properties'])

@@ -15,10 +15,8 @@ class Collection(object):
 
   def on_get(self, req, resp):
     try:
-      filters = []; append2filters = filters.append
-      # default filters
-      append2filters(('meta.deleted', '=', False))
-      append2filters(('meta.deleted', '', { '$exists': False }))
+      filters = [('meta.deleted', '', {'$in': [None, False]})]
+      append2filters = filters.append
       
       dateCreated   = req.get_param_as_time_interval('filters[dateCreated]')
       datePublished = req.get_param_as_time_interval('filters[datePublished]')
@@ -95,7 +93,6 @@ class Item:
     self.datasource = datasource
 
   def on_get(self, req, resp, id):
-    # try:
     fields = req.get_param_as_list('fields') or ()
     
     item = self.datasource.lookup(kind=self.name, 
@@ -116,9 +113,12 @@ class Item:
       item['headline'] = item['name']
       del item['headline']
 
-    print(item)
     req.context['data'] = item
-    
-    # except Exception as e:
-    #   logger.error(e)
-    #   raise falcon.HTTPInternalServerError()
+  
+  def on_delete(self, req, resp, id):
+    result = self.datasource.patch(kind=self.name, 
+                                   id=id,
+                                   properties={
+                                      '$set': {'meta.deleted': True}
+                                   })
+    resp.status = '204 No Content'

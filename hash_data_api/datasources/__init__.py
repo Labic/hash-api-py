@@ -19,3 +19,6 @@ class DatasourceEngine(object):
 
   def lookup(self, **kargs):
     return self.datasource.lookup(**kargs)
+
+  def patch(self, **kargs):
+    return self.datasource.patch(**kargs)
