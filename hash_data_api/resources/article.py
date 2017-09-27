@@ -16,11 +16,14 @@ class Collection(object):
   def on_get(self, req, resp):
     try:
       filters = []; append2filters = filters.append
+      # default filters
+      append2filters(('meta.deleted', '=', False))
+      append2filters(('meta.deleted', '', { '$exists': False }))
       
       dateCreated   = req.get_param_as_time_interval('filters[dateCreated]')
       datePublished = req.get_param_as_time_interval('filters[datePublished]')
       keywords      = req.get_param_as_list('filters[keywords]') or ()
-      fields        = req.get_param_as_list('fields') or ()
+      fields        = req.get_param_as_list('fields') or []
       page          = req.get_param_as_int('page') or 1
       per_page      = req.get_param_as_int('per_page') or 10
 

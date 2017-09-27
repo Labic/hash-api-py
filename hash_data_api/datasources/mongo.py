@@ -22,6 +22,9 @@ class MongoDatasource(object):
       property, operator, value = f
       
       # TODO: find a better way to discover tha is array
+      if operator == '':
+        filter[property] = value
+
       if operator == '=' and not '[]' in property:
         filter[property] = value
 
