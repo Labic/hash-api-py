@@ -11,6 +11,7 @@ from resources import article, hook, oauth
 
 cors = CORS(
   allow_all_origins=True,
+  allow_all_methods=True,
 )
 
 server = falcon.API(
